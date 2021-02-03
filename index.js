@@ -17,7 +17,7 @@ const url = 'mongodb+srv://temp-user:temp-password@sandbox.vawr3.gcp.mongodb.net
 const dbName = "Airport";
 const http = httpModule.Server(app);
 const io = socketModule(http);
-const port = 3000;
+const port =process.env.PORT || 3000;
 
 /**
  *  App Configuration
