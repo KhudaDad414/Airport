@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><%= socket %> Airport Flight Board</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+</head>
+<body>
+<h3>Arrivals</h3>
+<table class="table table-striped table-dark" id="arrivals">
+    <tr class='row'>
+        <th scope="col">Terminal</th>
+        <th scope="col">Airline</th>
+        <th scope="col">From</th>
+        <th scope="col">Arrival Time</th>
+        <th scope="col">Airplane</th>
+        <th scope="col">Flight No</th>
+        <th scope="col">Distance</th>
+        <th scope="col">Remarks</th>
+
+    </tr>
+
+    <%- arrivals %>
+</table>
+<h3>Departure</h3>
+<table class="table table-striped table-dark" id="departures">
+    <tr class='row'>
+        <th>Terminal</th>
+        <th>Airline</th>
+        <th>To</th>
+        <th>Take-off Time</th>
+        <th>Airplane</th>
+        <th>Flight No</th>
+        <th>Distance</th>
+        <th>Remarks</th>
+    </tr>
+    <%- departures %>
+</table>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    let current_city = '<%= socket %>'
+    let socket = io();
+    console.log("page loaded.")
+
+    function createRow(flight, isInsert) {
+        console.log(JSON.stringify(flight))
+        let updatedRow;
+        updatedRow = "<tr class='row' id=flight" + flight._id + ">\n" +
+            "        <td>" + flight.terminal + "</td>\n" +
+            "        <td>" + flight.airline + "</td>\n" +
+            "        <td>" + (flight.src_airport === current_city ? flight.dst_airport : flight.src_airport) + "</td>\n" +
+            "        <td>" + (flight.src_airport === current_city ? flight.takeoff_time : flight.arrival_time) + "</td>\n" +
+            "        <td>" + flight.airplane + "</td>\n" +
+            "        <td>" + flight._id + "</td>\n" +
+            "        <td>" + flight.distance + " km</td>\n" +
+            "        <td " + (flight.remark === 'DELAYED' ? "style=\"color: red;\">" : "style=\"color: green;\">") + flight.remark + "</td>\n" +
+            "    </tr>";
+        console.log("update row :" + updatedRow);
+        if (isInsert) {
+            let table = (current_city === flight.src_airport) ? document.querySelector("#departures") : document.querySelector("#arrivals");
+            let newRow = table.insertRow()
+            newRow.outerHTML = updatedRow
+
+        } else {
+            let item = document.querySelector('#flight' + flight._id);
+            item.outerHTML = updatedRow;
+        }
+
+    }
+
+    socket.on(current_city, function (data) {
+        console.log("incoming data from socket...")
+        if (data.operationType === "update")
+            createRow(data.fullDocument, false)
+        else createRow(data.fullDocument, true)
+
+    });
+</script>
+</body>
+</html>
