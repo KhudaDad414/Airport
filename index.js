@@ -13,7 +13,7 @@ const ejsModule = require("ejs");
  */
 const MongoClient = mongodb.MongoClient;
 const app = express();
-const url = 'mongodb+srv://temp-user:temp-password@sandbox.vawr3.gcp.mongodb.net/Airport';
+const url = 'mongodb://localhost';
 const dbName = "Airport";
 const http = httpModule.Server(app);
 const io = socketModule(http);
@@ -26,7 +26,6 @@ let routesCollection;
  *  App Configuration
  */
 app.engine('html', ejsModule.renderFile);
-express.static("public");
 
 /**
  * Routes Definitions
@@ -116,7 +115,7 @@ app.get('/Status', async (req, res) => {
     arrivals = convertToRow(flightsWithDistance.filter(flight => flight.dst_airport === station), true)
     departures = convertToRow(flightsWithDistance.filter(flight => flight.src_airport === station), false)
     console.log("Sending HTML file to the client...")
-    res.render(__dirname + "/public/airport.html", {
+    res.render(__dirname + "/templates/airport.html", {
         socket: station,
         arrivals: arrivals,
         departures: departures
@@ -178,7 +177,7 @@ app.get('/Dashboard', async (req, res) => {
     const flights = await getFlights()
     convertedFlights = convertToRow(flights)
     console.log("Sending HTML file to the client...")
-    res.render(__dirname + "/public/airline.html", {
+    res.render(__dirname + "/templates/airline.html", {
         airline: current_airline,
         flights: convertedFlights,
     });
