@@ -26,6 +26,7 @@ let routesCollection;
  *  App Configuration
  */
 app.engine('html', ejsModule.renderFile);
+express.static("public");
 
 /**
  * Routes Definitions
@@ -115,7 +116,7 @@ app.get('/Status', async (req, res) => {
     arrivals = convertToRow(flightsWithDistance.filter(flight => flight.dst_airport === station), true)
     departures = convertToRow(flightsWithDistance.filter(flight => flight.src_airport === station), false)
     console.log("Sending HTML file to the client...")
-    res.render(__dirname + "/templates/airport.html", {
+    res.render(__dirname + "/public/airport.html", {
         socket: station,
         arrivals: arrivals,
         departures: departures
@@ -177,7 +178,7 @@ app.get('/Dashboard', async (req, res) => {
     const flights = await getFlights()
     convertedFlights = convertToRow(flights)
     console.log("Sending HTML file to the client...")
-    res.render(__dirname + "/templates/airline.html", {
+    res.render(__dirname + "/public/airline.html", {
         airline: current_airline,
         flights: convertedFlights,
     });
