@@ -1,0 +1,79 @@
+<%- include ('./header.html') %>
+
+
+<h3>Arrivals</h3>
+<table class="table table-striped table-dark" id="arrivals">
+    <tr class='row'>
+        <th scope="col">Terminal</th>
+        <th scope="col">Airline</th>
+        <th scope="col">From</th>
+        <th scope="col">Arrival Time</th>
+        <th scope="col">Airplane</th>
+        <th scope="col">Flight No</th>
+        <th scope="col">Distance</th>
+        <th scope="col">Remarks</th>
+
+    </tr>
+
+    <% arrivals.forEach(function(flight){ %>
+
+    <tr class='row' id=flight<%= flight._id %>>
+            <td><%= flight.terminal %></td>
+            <td><%= flight.airline %></td>
+            <td><%= flight.src_airport %></td>
+            <td><%= flight.arrival_time %></td>
+            <td><%= flight.airplane %></td>
+            <td><%= flight._id %></td>
+            <td><%= flight.distance %> km</td>
+        <td <% if(flight.remark === 'DELAYED'){ %>
+         style="color: red;"
+        <% } else { %>
+        style="color: green;"
+        <% } %>
+        ><%= flight.remark %>
+        </td>
+        </tr>
+
+    <% }) %>
+</table>
+<h3>Departure</h3>
+<table class="table table-striped table-dark" id="departures">
+    <tr class='row'>
+        <th>Terminal</th>
+        <th>Airline</th>
+        <th>To</th>
+        <th>Take-off Time</th>
+        <th>Airplane</th>
+        <th>Flight No</th>
+        <th>Distance</th>
+        <th>Remarks</th>
+    </tr>
+
+    <% departures.forEach(function(flight){ %>
+
+    <tr class='row' id=flight<%= flight._id %>>
+        <td><%= flight.terminal %></td>
+        <td><%= flight.airline %></td>
+        <td><%= flight.dst_airport %></td>
+        <td><%= flight.takeoff_time %></td>
+        <td><%= flight.airplane %></td>
+        <td><%= flight._id %></td>
+        <td><%= flight.distance %> km</td>
+        <td <% if(flight.remark === 'DELAYED'){ %>
+        style="color: red;"
+        <% } else { %>
+        style="color: green;"
+        <% } %>
+        ><%= flight.remark %>
+        </td>
+    </tr>
+
+    <% }) %>
+
+
+</table>
+<script type="text/javascript" src="/public/socket.io.js"></script>
+<script>let current_city = '<%= socket %>'</script>
+<script type="text/javascript" src="/public/flightStatus.js"></script>
+
+<%- include ('./footer.html') %>
