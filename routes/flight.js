@@ -2,20 +2,11 @@ let io;
 exports.initialize = function (io_from) {
     io = io_from;
 }
-exports.status = async function (req, res) {
-    await require("../controllers/controllers").connectDatabase()
-
-    let station = req.query.airport;
-    let arrivals = "";
-    let departures = "";
-
-
-    function zeroPad(num, places) {
-        return String(num).padStart(places, '0');
-    }
-
-    async function getFlightDistance(flight) {
-        try {
+function zeroPad(num, places) {
+    return String(num).padStart(places, '0');
+}
+async function getFlightDistance(flight) {
+    try {
         let cursor = airportsCollection.aggregate([{
             "$geoNear": {
                 "near": flight.location, "spherical": true, "distanceField": "distance", "distanceMultiplier": 0.001
@@ -47,18 +38,52 @@ exports.status = async function (req, res) {
     }catch(err){
         console.log("got an error while fetching "+flight._id+" flights' distance." + err)
     }
-    }
+}
+async function getFlightsByAirline(airline) {
+    let flights = [];
+    let condition = {"airline": airline};
+    console.log("Getting flights Info...")
+    let cursor = routesCollection.find(condition);
+    await cursor.forEach(flight => flights.push(flight))
+    return flights;
+}
+async function getFlightsByAirport(airport) {
+    let flights = [];
+    let condition = {$or: [{dst_airport: airport}, {src_airport: airport}]};
+    console.log("Getting flights Info...")
+    let cursor = routesCollection.find(condition);
+    await cursor.forEach(flight => flights.push(flight))
+    return flights;
+}
+function flightHandler(flight) {
+    console.log("Received updated data.")
+    const query = {_id: flight._id};
+    const update = {
+        $set: {
+            _id: flight._id,
+            terminal: flight.terminal,
+            airline: flight.airline,
+            "src_airport": flight.src_airport,
+            "dst_airport": flight.dst_airport,
+            "remark": flight.remark,
+            "location": flight.location,
+            "airplane": flight.airplane,
+            "takeoff_time": flight.takeoff_time,
+            "arrival_time": flight.arrival_time
+        }
+    };
+    const options = {upsert: true};
+    routesCollection.updateOne(query, update, options);
+}
+exports.status = async function (req, res) {
+    await require("../controllers/controllers").connectDatabase()
 
-    async function getFlights() {
-        let flights = [];
-        let condition = {$or: [{dst_airport: station}, {src_airport: station}]};
-        console.log("Getting flights Info...")
-        let cursor = routesCollection.find(condition);
-        await cursor.forEach(flight => flights.push(flight))
-        return flights;
-    }
+    let station = req.query.airport;
+    let arrivals = "";
+    let departures = "";
 
-    const flights = await getFlights()
+
+    const flights = await getFlightsByAirport(station)
     const promises = flights.map((flight) => {
         return getFlightDistance(flight).then((distance) => {
             flight.distance = distance;
@@ -93,22 +118,16 @@ exports.status = async function (req, res) {
     });
 
 }
+
 exports.dashboard = async function (req, res) {
     await require("../controllers/controllers").connectDatabase()
     let current_airline = req.query.airline;
     let convertedFlights = "";
 
 
-    async function getFlights() {
-        let flights = [];
-        let condition = {"airline": current_airline};
-        console.log("Getting flights Info...")
-        let cursor = routesCollection.find(condition);
-        await cursor.forEach(flight => flights.push(flight))
-        return flights;
-    }
 
-    const flights = await getFlights()
+
+    const flights = await getFlightsByAirline(current_airline)
 
     console.log("Sending HTML file to the client...")
     res.render("../views/flightDashboard.html", {
@@ -120,24 +139,5 @@ exports.dashboard = async function (req, res) {
         socket.on('flight change', flightHandler);
     });
 
-    function flightHandler(flight) {
-        console.log("Received updated data.")
-        const query = {_id: flight._id};
-        const update = {
-            $set: {
-                _id: flight._id,
-                terminal: flight.terminal,
-                airline: flight.airline,
-                "src_airport": flight.src_airport,
-                "dst_airport": flight.dst_airport,
-                "remark": flight.remark,
-                "location": flight.location,
-                "airplane": flight.airplane,
-                "takeoff_time": flight.takeoff_time,
-                "arrival_time": flight.arrival_time
-            }
-        };
-        const options = {upsert: true};
-        routesCollection.updateOne(query, update, options);
-    }
+
 }
