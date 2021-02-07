@@ -1,10 +1,13 @@
 let io;
+let station;
 exports.initialize = function (io_from) {
     io = io_from;
 }
+
 function zeroPad(num, places) {
     return String(num).padStart(places, '0');
 }
+
 async function getFlightDistance(flight) {
     try {
         let cursor = airportsCollection.aggregate([{
@@ -35,10 +38,11 @@ async function getFlightDistance(flight) {
         }]);
         let result2 = await cursor2.get();
         return zeroPad(Math.round(result[0].distance), 4) + "/" + zeroPad(Math.round(result2[0].totalDistance), 4);
-    }catch(err){
-        console.log("got an error while fetching "+flight._id+" flights' distance." + err)
+    } catch (err) {
+        console.log("got an error while fetching " + flight._id + " flights' distance." + err)
     }
 }
+
 async function getFlightsByAirline(airline) {
     let flights = [];
     let condition = {"airline": airline};
@@ -47,6 +51,7 @@ async function getFlightsByAirline(airline) {
     await cursor.forEach(flight => flights.push(flight))
     return flights;
 }
+
 async function getFlightsByAirport(airport) {
     let flights = [];
     let condition = {$or: [{dst_airport: airport}, {src_airport: airport}]};
@@ -55,9 +60,22 @@ async function getFlightsByAirport(airport) {
     await cursor.forEach(flight => flights.push(flight))
     return flights;
 }
-function flightHandler(flight) {
+
+async function flightHandler(flight) {
     console.log("Received updated data.")
     const query = {_id: flight._id};
+    //check if the src_airport or dst_airport is changed then send a signal to the respective airports the delete the entry
+    let databaseFlight;
+    let cursor = routesCollection.find(query);
+    await cursor.forEach(flight => databaseFlight = flight)
+    if (databaseFlight) {
+        if (databaseFlight.src_airport !== flight.src_airport) {
+            io.emit(databaseFlight.src_airport, {operationType: "delete", _id: flight._id})
+        } else if (databaseFlight.dst_airport !== flight.dst_airport) {
+            io.emit(databaseFlight.dst_airport, {operationType: "delete", _id: flight._id})
+        }
+    }
+
     const update = {
         $set: {
             _id: flight._id,
@@ -75,10 +93,11 @@ function flightHandler(flight) {
     const options = {upsert: true};
     routesCollection.updateOne(query, update, options);
 }
+
 exports.status = async function (req, res) {
     await require("../controllers/controllers").connectDatabase()
 
-    let station = req.query.airport;
+    station = req.query.airport;
     let arrivals = "";
     let departures = "";
 
@@ -123,8 +142,6 @@ exports.dashboard = async function (req, res) {
     await require("../controllers/controllers").connectDatabase()
     let current_airline = req.query.airline;
     let convertedFlights = "";
-
-
 
 
     const flights = await getFlightsByAirline(current_airline)

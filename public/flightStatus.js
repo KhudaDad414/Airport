@@ -1,6 +1,5 @@
-
-
 let socket = io();
+
 function createRow(flight, isInsert) {
     console.log(JSON.stringify(flight))
     let updatedRow;
@@ -15,13 +14,14 @@ function createRow(flight, isInsert) {
         "        <td " + (flight.remark === 'DELAYED' ? "style=\"color: red;\">" : "style=\"color: green;\">") + flight.remark + "</td>\n" +
         "    </tr>";
     console.log("update row :" + updatedRow);
-    if (isInsert) {
+    let item = document.querySelector('#flight' + flight._id);
+    if (isInsert || item === null) {
         let table = (current_city === flight.src_airport) ? document.querySelector("#departures") : document.querySelector("#arrivals");
         let newRow = table.insertRow()
         newRow.outerHTML = updatedRow
 
     } else {
-        let item = document.querySelector('#flight' + flight._id);
+
         item.outerHTML = updatedRow;
     }
 
@@ -29,8 +29,13 @@ function createRow(flight, isInsert) {
 
 socket.on(current_city, function (data) {
     console.log("incoming data from socket...")
-    if (data.operationType === "update")
+    if (data.operationType === "update") {
         createRow(data.fullDocument, false)
-    else createRow(data.fullDocument, true)
+    } else if (data.operationType === "delete") {
+        let item = document.querySelector('#flight' + data._id);
+        item.outerHTML = ""
+
+    } else
+        createRow(data.fullDocument, true)
 
 });

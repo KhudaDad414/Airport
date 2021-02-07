@@ -18,21 +18,22 @@
     <% arrivals.forEach(function(flight){ %>
 
     <tr class='row' id=flight<%= flight._id %>>
-            <td><%= flight.terminal %></td>
-            <td><%= flight.airline %></td>
-            <td><%= flight.src_airport %></td>
-            <td><%= flight.arrival_time %></td>
-            <td><%= flight.airplane %></td>
-            <td><%= flight._id %></td>
-            <td><%= flight.distance %> km</td>
-        <td <% if(flight.remark === 'DELAYED'){ %>
-         style="color: red;"
+        <td><%= flight.terminal %></td>
+        <td><%= flight.airline %></td>
+        <td><%= flight.src_airport %></td>
+        <td><%= flight.arrival_time %></td>
+        <td><%= flight.airplane %></td>
+        <td><%= flight._id %></td>
+        <td><%= flight.distance %> km</td>
+        <td
+        <% if(flight.remark === 'DELAYED'){ %>
+        style="color: red;"
         <% } else { %>
         style="color: green;"
         <% } %>
         ><%= flight.remark %>
         </td>
-        </tr>
+    </tr>
 
     <% }) %>
 </table>
@@ -59,7 +60,8 @@
         <td><%= flight.airplane %></td>
         <td><%= flight._id %></td>
         <td><%= flight.distance %> km</td>
-        <td <% if(flight.remark === 'DELAYED'){ %>
+        <td
+        <% if(flight.remark === 'DELAYED'){ %>
         style="color: red;"
         <% } else { %>
         style="color: green;"

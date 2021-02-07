@@ -1,7 +1,4 @@
-
-
-
-exports.index = async function (req, res){
+exports.index = async function (req, res) {
     await require("../controllers/controllers").connectDatabase()
 
     let airports = routesCollection.distinct("src_airport")
