@@ -1,0 +1,42 @@
+<%- include ('./header.html') %>
+
+
+<h3>Flights</h3>
+<table class="table table-striped table-dark" id="flights">
+    <tr class='row'>
+        <th scope="col">Flight No</th>
+        <th scope="col">Terminal</th>
+        <th scope="col">From</th>
+        <th scope="col">To</th>
+        <th scope="col">Arrival Time</th>
+        <th scope="col">Departure Time</th>
+        <th scope="col">Airplane</th>
+        <th scope="col">Remarks</th>
+
+    </tr>
+
+    <% flights.forEach(function(flight){ %>
+
+    <tr class='row' id=flight<%= flight._id %>>
+        <td> <input class='flight_no' disabled="disabled" type='text' value='<%= flight._id %>'/></td>
+        <td><input class='terminal' type='text' value='<%= flight.terminal %>'/></td>
+        <td><input class='from' type='text' value='<%= flight.src_airport %>'/></td>
+        <td><input class='to' type='text' value='<%= flight.dst_airport %>'/></td>
+        <td><input class='arrival_time' type='text' value='<%= flight.arrival_time %>'/></td>
+        <td><input class='takeoff_time' type='text' value='<%= flight.takeoff_time %>'/></td>
+        <td><input class='airplane' type='text' value='<%= flight.airplane %>'/></td>
+        <td style="display: none;"><input class='location' type='text' value='<%= JSON.stringify(flight.location) %>'/></td>
+        <td><input class='remark' type='text' value='<%= flight.remark %>'/></td>
+    </tr>
+
+    <% }) %>
+
+
+
+</table>
+<button style='width: 90%; margin-left:5%; margin-right:5%' type="button" class="btn btn-default navbar-btn" onclick="addFlight()">Add Flight</button>
+<script type="text/javascript" src="/public/socket.io.js"></script>
+<script>let current_airline = '<%= airline %>'</script>
+<script type="text/javascript" src="/public/flightDashboard.js"></script>
+
+<%- include ('./footer.html') %>

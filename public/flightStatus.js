@@ -1,47 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title><%= socket %> Airport Flight Board</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 
-</head>
-<body>
-<h3>Arrivals</h3>
-<table class="table table-striped table-dark" id="arrivals">
-    <tr class='row'>
-        <th scope="col">Terminal</th>
-        <th scope="col">Airline</th>
-        <th scope="col">From</th>
-        <th scope="col">Arrival Time</th>
-        <th scope="col">Airplane</th>
-        <th scope="col">Flight No</th>
-        <th scope="col">Distance</th>
-        <th scope="col">Remarks</th>
 
-    </tr>
-
-    <%- arrivals %>
-</table>
-<h3>Departure</h3>
-<table class="table table-striped table-dark" id="departures">
-    <tr class='row'>
-        <th>Terminal</th>
-        <th>Airline</th>
-        <th>To</th>
-        <th>Take-off Time</th>
-        <th>Airplane</th>
-        <th>Flight No</th>
-        <th>Distance</th>
-        <th>Remarks</th>
-    </tr>
-    <%- departures %>
-</table>
-<script type="text/javascript" src="/socket.io/socket.io.js"></script>
-<script>let current_city = '<%= socket %>'
 let socket = io();
-
-
 function createRow(flight, isInsert) {
     console.log(JSON.stringify(flight))
     let updatedRow;
@@ -74,6 +33,4 @@ socket.on(current_city, function (data) {
         createRow(data.fullDocument, false)
     else createRow(data.fullDocument, true)
 
-});</script>
-</body>
-</html>
+});

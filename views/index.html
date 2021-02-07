@@ -1,0 +1,15 @@
+<%- include ('./header.html') %>
+
+
+
+<h2 style='margin: 4px'>Airports' Status</h2>
+<% for (let i = 0; i < data[0].length; i++) { %>
+<a style='width: 90%; margin-left:5%; margin-right:5%' type=\"button\" class=\"btn btn-outline-primary\" href=/Status?airport=<%= data[0][i] %> target='_blank'><%= data[0][i] %>  </a><br>
+<% } %>
+<h2 style='margin: 4px'>Airlines' Dashboards</h2>
+<% for (let i = 0; i < data[1].length; i++) { %>
+<a style='width: 90%; margin-left:5%; margin-right:5%' type=\"button\" class=\"btn btn-outline-primary\" href=/Dashboard?airline=<%= data[1][i] %> target='_blank'><%= data[1][i] %>  </a><br>
+<% } %>
+
+
+<%- include ('./footer.html') %>
