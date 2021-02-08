@@ -5,9 +5,9 @@ const express = require('express');
 const path = require('path');
 const httpModule = require('http');
 const socketModule = require('socket.io');
-const ejsModule = require("ejs");
-const indexRoute = require("./routes/index")
-const flightRoute = require("./routes/flight")
+const ejsModule = require('ejs');
+const indexRoute = require('./routes/index');
+const flightRoute = require('./routes/flight');
 /**
  * App Variables
  */
@@ -37,20 +37,7 @@ app.get('/', indexRoute.index);
  * Server Activation
  */
 http.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
-
+  console.log(`Example app listening at http://localhost:${port}`);
 });
-
-
-
-
-
-
-
-
-
-
-
-
 
 
